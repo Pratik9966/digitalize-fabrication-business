@@ -3,7 +3,11 @@ using DigitalizeFabricationBussiness.Models;
 using DigitalizeFabricationBussiness.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using DigitalizeFabricationBussiness.Utilities.Enumes;
+using DigitalizeFabricationBussiness.Utilities.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DigitalizeFabricationBussiness.Repositories
 {
@@ -15,7 +19,8 @@ namespace DigitalizeFabricationBussiness.Repositories
         {
             _contextFactory = contextFactory;
         }
-
+        
+        
         public async Task<Product> CreateProduct(Product product)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
@@ -49,11 +54,16 @@ namespace DigitalizeFabricationBussiness.Repositories
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             var product = await context.Products.FindAsync(productId);
-            if (product != null)
+            
+            if (product is null)
             {
-                context.Products.Remove(product);
-                await context.SaveChangesAsync();
+                throw new CustomException(HttpStatusCode.NotFound,
+                    "Product not found",
+                    ErrorCode.PRODUCT_NOT_FOUND);
             }
+            
+            context.Products.Remove(product);
+            await context.SaveChangesAsync();
         }
     }
 }

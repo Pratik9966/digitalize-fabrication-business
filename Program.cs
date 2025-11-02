@@ -13,7 +13,6 @@ using DigitalizeFabricationBussiness.Services;
 using DigitalizeFabricationBussiness.Repositories.Interface;
 using DigitalizeFabricationBussiness.Repositories;
 using DigitalizedFabricationBusiness.GraphQL.Queries;
-using DigitalizedFabricationBusiness.GraphQL.Mutations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,11 +42,11 @@ builder.Services
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .SetPagingOptions(new HotChocolate.Types.Pagination.PagingOptions
+    .ModifyPagingOptions(options =>
     {
-        MaxPageSize = 100,
-        DefaultPageSize = 10,
-        IncludeTotalCount = true
+        options.MaxPageSize = 100;
+        options.DefaultPageSize = 10;
+        options.IncludeTotalCount = true;
     })
     .AddErrorFilter<GraphQLErrorFilter>();
 
