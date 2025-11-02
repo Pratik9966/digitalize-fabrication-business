@@ -139,6 +139,7 @@ msbuild.wrn
 
 # Local secrets
 secrets.json
+appsettings.json
 appsettings.Development.json
 appsettings.Local.json
 appsettings.*.local.json
