@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
 using AutoMapper;
-using DigitalizeFabricationBussiness.ApplicationDBContext;
 using DigitalizeFabricationBussiness.DTOs;
 using DigitalizeFabricationBussiness.Models;
 using DigitalizeFabricationBussiness.Repositories.Interface;
@@ -10,7 +9,6 @@ using DigitalizeFabricationBussiness.Services.Interface;
 using DigitalizeFabricationBussiness.Utilities.Enumes;
 using DigitalizeFabricationBussiness.Utilities.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
@@ -20,19 +18,19 @@ public class UserService: IUserService
 {
     private readonly IUserRepository _useRepository;
     private readonly IMapper _mapper;
-    private readonly DigitalizeFabricationBusinessDBContext _context;
+    private readonly IRoleRepository _roleRepository;
     private readonly IConfiguration _config;
 
     public UserService(
         IUserRepository useRepository,
         IMapper mapper,
-        DigitalizeFabricationBusinessDBContext context,
+        IRoleRepository roleRepository,
         IConfiguration config
     )
     {
         _useRepository = useRepository;
         _mapper = mapper;
-        _context = context;
+        _roleRepository = roleRepository;
         _config = config;
     }
 
@@ -54,7 +52,7 @@ public class UserService: IUserService
 
         User userTobeSaved = _mapper.Map<User>(userDto);
 
-        Role? customerRole = await _context.Roles.FirstOrDefaultAsync(role => role.RoleName == nameof(RolesEnum.CUSTOMER));
+        Role? customerRole = await _roleRepository.GetRoleByName(nameof(RolesEnum.CUSTOMER));
 
         if (customerRole == null)
             throw new CustomException(HttpStatusCode.BadRequest,

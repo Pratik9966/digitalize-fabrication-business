@@ -11,6 +11,9 @@ namespace DigitalizeFabricationBussiness.Mappers
             CreateMap<UserInputDTO, User>();
             CreateMap<User, UserOutputDTO>();
             CreateMap<AddressInput, Address>();
+
+            CreateMap<ProductInputDTO, Product>();
+            CreateMap<Product, ProductOutputDTO>();
         }
     }
 }

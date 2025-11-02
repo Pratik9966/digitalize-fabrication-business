@@ -12,6 +12,8 @@ using DigitalizeFabricationBussiness.Services.Interface;
 using DigitalizeFabricationBussiness.Services;
 using DigitalizeFabricationBussiness.Repositories.Interface;
 using DigitalizeFabricationBussiness.Repositories;
+using DigitalizedFabricationBusiness.GraphQL.Queries;
+using DigitalizedFabricationBusiness.GraphQL.Mutations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +21,12 @@ var configuration = builder.Configuration;
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddDbContext<DigitalizeFabricationBusinessDBContext>(options =>
+builder.Services.AddPooledDbContextFactory<DigitalizeFabricationBusinessDBContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 
@@ -30,12 +35,20 @@ builder.Services
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddTypeExtension<AuthenticationQuery>()
+    .AddTypeExtension<ProductQuery>()
     .AddMutationType<Mutation>()
     .AddTypeExtension<AuthenticationMutation>()
+    .AddTypeExtension<ProductMutation>()
     .AddType<UserType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting()
+    .SetPagingOptions(new HotChocolate.Types.Pagination.PagingOptions
+    {
+        MaxPageSize = 100,
+        DefaultPageSize = 10,
+        IncludeTotalCount = true
+    })
     .AddErrorFilter<GraphQLErrorFilter>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
